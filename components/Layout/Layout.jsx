@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { styled } from '@mui/material/styles'
 import Box from '@mui/material/Box'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
-
+import { ThemeProvider } from '@mui/material/styles'
+import { getCurrentTheme, toggleTheme } from '../Theme/Theme'
 import CssBaseline from '@mui/material/CssBaseline'
-
+import { Outlet } from 'react-router-dom'
 import Header from '../Header/Header'
 import SidePanel from '../SidePanel/SidePanel'
 import Footer from '../Footer/Footer'
-import MainContent from '../MainContent/MainContent'
-
+import { Container } from '@mui/material'
+import Divider from '@mui/material/Divider'
 const drawerWidth = 240
 
 const openedMixin = (theme) => ({
@@ -44,13 +44,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }))
 
 export default function MiniDrawer() {
-  const [isDarkMode, setIsDarkMode] = React.useState(false)
-
   const [open, setOpen] = React.useState(false)
-
-  const themeToggle = () => {
-    setIsDarkMode(!isDarkMode)
-  }
+  const [currentTheme, setCurrentTheme] = React.useState(getCurrentTheme())
   const handleDrawerOpen = () => {
     setOpen(true)
   }
@@ -58,47 +53,71 @@ export default function MiniDrawer() {
   const handleDrawerClose = () => {
     setOpen(false)
   }
-  const theme = createTheme({
-    palette: {
-      mode: isDarkMode ? 'dark' : 'light',
-    },
-  })
+  const handleThemeToggle = () => {
+    toggleTheme() // Toggle the theme using the theme manager
+    setCurrentTheme(getCurrentTheme()) // Update the component state with the new theme
+  }
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={currentTheme}>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <CssBaseline />
         <Header
           open={open}
           drawerWidth={drawerWidth}
           handleDrawerOpen={handleDrawerOpen}
-          theme={theme}
-          themeToggle={themeToggle}
+          theme={currentTheme}
+          themeToggle={handleThemeToggle}
         />
 
         {/* Layout for SidePanel + MainContent + Footer */}
-        <Box sx={{ display: 'flex', flex: '1', overflow: 'hidden' }}>
+        <Box sx={{ display: 'flex', flex: '1', overflow: 'auto' }}>
           {/* SidePanel */}
           <SidePanel
             handleDrawerClose={handleDrawerClose}
-            theme={theme}
+            theme={currentTheme}
             open={open}
             openedMixin={openedMixin}
             closedMixin={closedMixin}
             DrawerHeader={DrawerHeader}
           />
-
           {/* Main Content Area */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
-            <Box sx={{ flex: '1', overflowY: 'auto', p: 3, pt: 10 }}>
-              <MainContent />
-            </Box>
 
-            {/* Footer */}
-            <Box sx={{}}>
-              <Footer />
-            </Box>
+          <Box
+            component="main"
+            sx={{
+              marginTop: 10,
+              flexGrow: 1,
+              display: 'flex',
+              flexDirection: 'column', // Change this to column
+            }}
+          >
+            <Divider></Divider>
+
+            <Container
+              sx={{
+                flexGrow: 1,
+                display: 'flex',
+                flexDirection: 'column', // Ensure this is column as well
+              }}
+            >
+              <Outlet />
+            </Container>
+
+            <Divider></Divider>
           </Box>
+          <Divider></Divider>
         </Box>
+      </Box>
+
+      {/* Footer */}
+      <Box
+        sx={{
+          width: '100%',
+          backgroundColor: 'background.default',
+        }}
+      >
+        <Footer />
       </Box>
     </ThemeProvider>
   )

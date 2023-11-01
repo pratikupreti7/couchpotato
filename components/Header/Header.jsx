@@ -1,20 +1,18 @@
 import MuiAppBar from '@mui/material/AppBar'
-import * as React from 'react'
 import { styled } from '@mui/material/styles'
-import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
 import MenuIcon from '@mui/icons-material/Menu'
 import Toolbar from '@mui/material/Toolbar'
-import { IconButton } from '@mui/material'
+import { Button, IconButton, Typography } from '@mui/material'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
-import Tooltip from '@mui/material/Tooltip'
-import Avatar from '@mui/material/Avatar'
-import Menu from '@mui/material/Menu'
-import Box from '@mui/material/Box'
-import MenuItem from '@mui/material/MenuItem'
 import Search from '../Search/Search'
 import couch from '../../src/assets/potato.png'
+import LoadingButton from '@mui/lab/LoadingButton'
+import LoginIcon from '@mui/icons-material/Login'
+import CircularProgress from '@mui/material/CircularProgress'
 import './index.css'
+import { Link } from 'react-router-dom'
 const Header = ({
   handleDrawerOpen,
   open,
@@ -22,21 +20,9 @@ const Header = ({
   drawerWidth,
   themeToggle,
 }) => {
-  //   const avatarRef = React.useRef(null)
-  const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
-  const [anchorElUser, setAnchorElUser] = React.useState(null)
-
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget)
-  }
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null)
-  }
-
   const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
-  })(({ open }) => ({
+  })(({ open, theme }) => ({
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
@@ -52,6 +38,8 @@ const Header = ({
     }),
   }))
 
+  const isLoggedin = false
+  const isLoading = false
   return (
     <AppBar position="fixed" open={open}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -59,7 +47,7 @@ const Header = ({
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-around',
+            justifyContent: 'space-between',
           }}
         >
           <IconButton
@@ -85,11 +73,63 @@ const Header = ({
 
         <Box
           sx={{
+            marginLeft: 1,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-evenly',
+            justifyContent: 'space-around',
           }}
         >
+          {!isLoggedin &&
+            (isLoading ? (
+              <Link to="/signup">
+                <LoadingButton loading variant="outlined">
+                  <Typography variant="button">Sign In</Typography>
+                </LoadingButton>
+              </Link>
+            ) : (
+              <>
+                {/* For larger screens */}
+                <Link to="/signin">
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      color: theme.palette.loginButton.text,
+                      borderColor: theme.palette.loginButton.border,
+                      backgroundColor: theme.palette.loginButton.main,
+                      '&:hover': {
+                        backgroundColor:
+                          theme.palette.loginButton.hoverBackground,
+                        borderColor: theme.palette.loginButton.hoverBackground,
+                      },
+                      transition: 'all 0.3s ease', // Smooth transition for all changes
+                      '@media (max-width:600px)': { display: 'none' }, // Hide on small screens
+                    }}
+                  >
+                    {' '}
+                    <Typography variant="button">Sign In</Typography>
+                  </Button>
+                </Link>
+                {/* For smaller screens */}
+
+                <Link to="/signin">
+                  <IconButton
+                    sx={{
+                      '@media (min-width:601px)': { display: 'none' }, // Hide on larger screens
+                      color: theme.palette.loginButton.text, // Adjust color as needed
+                      borderColor: theme.palette.loginButton.border, // Adjust border as needed
+                      backgroundColor: theme.palette.loginButton.main, // Adjust background as needed
+                      '&:hover': {
+                        backgroundColor:
+                          theme.palette.loginButton.hoverBackground, // Adjust hover as needed
+                      },
+                    }}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? <CircularProgress size={24} /> : <LoginIcon />}
+                  </IconButton>
+                </Link>
+              </>
+            ))}
           <IconButton sx={{ ml: 1 }} onClick={themeToggle} color="inherit">
             {theme.palette.mode === 'dark' ? (
               <Brightness7Icon />
@@ -97,40 +137,6 @@ const Header = ({
               <Brightness4Icon />
             )}
           </IconButton>
-          <div style={{ padding: 1, margin: 5 }}>
-            <Box sx={{ display: 'flex' }}>
-              <Tooltip title="Open settings">
-                <IconButton
-                  id="avatar-button" // Added a unique ID
-                  onClick={(event) => handleOpenUserMenu(event)}
-                  sx={{ p: 0 }}
-                >
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                </IconButton>
-              </Tooltip>
-
-              <Menu
-                anchorEl={anchorElUser}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-                anchorOrigin={{
-                  vertical: 'bottom', // Change 'top' to 'bottom'
-                  horizontal: 'left',
-                }}
-                transformOrigin={{
-                  vertical: 'top', // Change 'top' to 'top'
-                  horizontal: 'right',
-                }}
-              >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-          </div>
-         
         </Box>
       </Toolbar>
     </AppBar>

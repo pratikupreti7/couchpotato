@@ -7,19 +7,18 @@ import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import InboxIcon from '@mui/icons-material/MoveToInbox'
-import MailIcon from '@mui/icons-material/Mail'
+import Tooltip from '@mui/material/Tooltip'
 import MuiDrawer from '@mui/material/Drawer'
 import { styled } from '@mui/material/styles'
-
 import React from 'react'
-import Tooltip from '@mui/material/Tooltip'
-// import IconButton from '@mui/material/IconButton'
-import Avatar from '@mui/material/Avatar'
 import Menu from '@mui/material/Menu'
-import Box from '@mui/material/Box'
 import MenuItem from '@mui/material/MenuItem'
-import Typography from '@mui/material/Typography'
+import InfoIcon from '@mui/icons-material/Info'
+import ContactsIcon from '@mui/icons-material/Contacts'
+import HomeIcon from '@mui/icons-material/Home'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+// ... (You can import more icons as necessary)
+import { Link } from 'react-router-dom'
 const SidePanel = ({
   drawerWidth,
   theme,
@@ -45,6 +44,7 @@ const SidePanel = ({
       '& .MuiDrawer-paper': closedMixin(theme),
     }),
   }))
+
   const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
   const [anchorElUser, setAnchorElUser] = React.useState(null)
 
@@ -55,6 +55,7 @@ const SidePanel = ({
   const handleCloseUserMenu = () => {
     setAnchorElUser(null)
   }
+
   return (
     <Drawer variant="permanent" open={open}>
       <DrawerHeader>
@@ -68,86 +69,64 @@ const SidePanel = ({
       </DrawerHeader>
       <Divider />
       <List>
-        <div>
-          <Box sx={{ display: 'flex' }}>
-            <Tooltip title="Open settings">
-              <IconButton
-                id="avatar-button" // Added a unique ID
-                onClick={(event) => handleOpenUserMenu(event)}
-              >
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
+        <ListItem key="Profile" disablePadding>
+          <ListItemButton
+            onClick={(event) => {
+              if (open) handleOpenUserMenu(event)
+            }}
+          >
+            <ListItemIcon style={{ fontSize: 30 }}>
+              {!open ? (
+                <Tooltip title={'Profile'} arrow>
+                  <AccountCircleIcon
+                    style={{ fontSize: 28 }} // Adjust the icon size here
+                    onClick={(event) => handleOpenUserMenu(event)}
+                  />
+                </Tooltip>
+              ) : (
+                <AccountCircleIcon style={{ fontSize: 28 }} />
+              )}
+            </ListItemIcon>
 
-            <Menu
-              anchorEl={anchorElUser}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-              anchorOrigin={{
-                vertical: 'bottom', // Change 'top' to 'bottom'
-                horizontal: 'left',
-              }}
-              transformOrigin={{
-                vertical: 'top', // Change 'top' to 'top'
-                horizontal: 'right',
-              }}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-        </div>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: open ? 'initial' : 'center',
-                px: 2.5,
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : 'auto',
-                  justifyContent: 'center',
-                }}
-              >
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+            {open && <ListItemText primary="User Name" />}
+          </ListItemButton>
+
+          <Menu
+            anchorEl={anchorElUser}
+            open={Boolean(anchorElUser)}
+            onClose={handleCloseUserMenu}
+          >
+            {settings.map((setting) => (
+              <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                {setting}
+              </MenuItem>
+            ))}
+          </Menu>
+        </ListItem>
+
+        {[
+          { text: 'Home', icon: <HomeIcon />, path: '/home' },
+          { text: 'About Us', icon: <InfoIcon />, path: '/aboutus' },
+          { text: 'Contacts', icon: <ContactsIcon />, path: '/contactus' },
+        ].map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton component={Link} to={item.path}>
+              <ListItemIcon style={{ fontSize: 30 }}>
+                {!open ? (
+                  <Tooltip title={item.text} arrow>
+                    {item.icon}
+                  </Tooltip>
+                ) : (
+                  item.icon
+                )}
               </ListItemIcon>
-              <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+              {open && <ListItemText primary={item.text} />}
             </ListItemButton>
           </ListItem>
         ))}
       </List>
+
       <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: open ? 'initial' : 'center',
-                px: 2.5,
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : 'auto',
-                  justifyContent: 'center',
-                }}
-              >
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
     </Drawer>
   )
 }
